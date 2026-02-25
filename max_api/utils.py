@@ -63,18 +63,24 @@ def validate_chat_id(chat_id: Any) -> int:
     Валидация chat_id
     
     Args:
-        chat_id: ID чата
+        chat_id: ID чата (положительный для пользователей, отрицательный для групп)
         
     Returns:
         int: Валидный chat_id
         
     Raises:
         ValueError: Если chat_id невалиден
+        
+    Note:
+        В MAX API:
+        - Положительные числа: личные чаты (пользователи)
+        - Отрицательные числа: групповые чаты
+        - 0 недопустим
     """
     try:
         chat_id = int(chat_id)
-        if chat_id <= 0:
-            raise ValueError("chat_id должен быть положительным числом")
+        if chat_id == 0:
+            raise ValueError("chat_id не может быть равен 0")
         return chat_id
     except (TypeError, ValueError) as e:
         raise ValueError(f"Невалидный chat_id: {e}")

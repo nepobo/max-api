@@ -19,17 +19,21 @@ class TestUtils:
     
     def test_validate_chat_id_valid(self):
         """Тест валидации корректного chat_id"""
+        # Положительные (личные чаты)
         assert validate_chat_id(123456) == 123456
         assert validate_chat_id("789012") == 789012
+        
+        # Отрицательные (групповые чаты)
+        assert validate_chat_id(-123456) == -123456
+        assert validate_chat_id("-789012") == -789012
     
     def test_validate_chat_id_invalid(self):
         """Тест валидации некорректного chat_id"""
-        with pytest.raises(ValueError):
-            validate_chat_id(-1)
-        
-        with pytest.raises(ValueError):
+        # Ноль недопустим
+        with pytest.raises(ValueError, match="не может быть равен 0"):
             validate_chat_id(0)
         
+        # Нечисловые значения
         with pytest.raises(ValueError):
             validate_chat_id("not_a_number")
     

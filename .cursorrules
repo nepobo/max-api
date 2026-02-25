@@ -22,7 +22,7 @@ Body: {"recipient": {"chat_id": 12374848}, "text": "Hello"}
 ```
 
 ### 2. Получение chat_id из обновлений ⚠️
-**ВСЕГДА** используй `sender.user_id` для ответа на личные сообщения:
+**ВСЕГДА** используй `sender.user_id` для ответа:
 ```python
 # ПРАВИЛЬНО ✅
 chat_id = message['sender']['user_id']
@@ -30,6 +30,13 @@ chat_id = message['sender']['user_id']
 # НЕПРАВИЛЬНО ❌
 chat_id = message['recipient']['chat_id']
 ```
+
+**Типы chat_id:**
+- **Положительные числа** - личные чаты (user_id пользователя)
+- **Отрицательные числа** - групповые чаты
+- **Важно:** Для получения событий из группового чата бот **ДОЛЖЕН** быть администратором группы!
+
+Подробнее: [docs/GROUP_CHATS.md](docs/GROUP_CHATS.md)
 
 ### 3. Long Polling timeout ⚠️
 Timeout при Long Polling - это **НОРМАЛЬНОЕ** поведение, не ошибка!
