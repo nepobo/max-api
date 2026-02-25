@@ -1,0 +1,97 @@
+╔══════════════════════════════════════════════════════════════╗
+║         MAX API Library - Инструкция по установке           ║
+╚══════════════════════════════════════════════════════════════╝
+
+📋 БЫСТРАЯ УСТАНОВКА (copy-paste):
+
+# 1. Установите python3-venv
+sudo apt update && sudo apt install python3.12-venv python3-full -y
+
+# 2. Запустите автоматический скрипт установки
+bash install.sh
+
+# 3. После установки отредактируйте .env
+nano .env
+# Добавьте: MAX_BOT_TOKEN=ваш_токен_здесь
+
+# 4. Запустите приложение
+bash run.sh
+
+════════════════════════════════════════════════════════════════
+
+📖 АЛЬТЕРНАТИВА - РУЧНАЯ УСТАНОВКА:
+
+cd /home/nepobo/Myprojects/max-api
+
+# Создание виртуального окружения
+python3 -m venv venv
+
+# Активация виртуального окружения
+source venv/bin/activate
+
+# Установка зависимостей
+pip install -r requirements.txt
+
+# Создание конфигурации
+cp .env.example .env
+nano .env  # Добавьте токен
+
+# Запуск
+python -m console_app.main
+
+════════════════════════════════════════════════════════════════
+
+🚀 ЗАПУСК ПРИМЕРОВ:
+
+source venv/bin/activate
+
+python examples/echo_bot.py          # Эхо-бот
+python examples/simple_bot.py        # Бот с командами
+python examples/keyboard_example.py <chat_id>  # Клавиатуры
+
+════════════════════════════════════════════════════════════════
+
+🧪 ТЕСТИРОВАНИЕ:
+
+source venv/bin/activate
+pytest tests/
+
+════════════════════════════════════════════════════════════════
+
+❓ ПОЛУЧЕНИЕ ТОКЕНА:
+
+1. Перейдите на https://business.max.ru/self
+2. Создайте чат-бота
+3. После модерации получите токен в разделе 
+   "Интеграция → Получить токен"
+
+════════════════════════════════════════════════════════════════
+
+📚 ДОКУМЕНТАЦИЯ:
+
+README.md           - Полная документация
+INSTALL_LINUX.md    - Подробная инструкция для Linux
+QUICKSTART.md       - Быстрый старт
+START_HERE.md       - Начните отсюда
+PROJECT_SUMMARY.md  - Резюме проекта
+
+════════════════════════════════════════════════════════════════
+
+💡 ПОЛЕЗНЫЕ КОМАНДЫ:
+
+# Активация venv
+source venv/bin/activate
+
+# Деактивация venv
+deactivate
+
+# Проверка установки
+python -c "from max_api import MAXClient; print('OK')"
+
+# Обновление зависимостей
+pip install --upgrade -r requirements.txt
+
+# Очистка и пересоздание venv
+rm -rf venv && python3 -m venv venv && source venv/bin/activate && pip install -r requirements.txt
+
+════════════════════════════════════════════════════════════════
