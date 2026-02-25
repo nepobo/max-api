@@ -5,13 +5,13 @@ Python-библиотека для работы с MAX Messenger API.
 ## Установка
 
 ```bash
-pip install git+https://github.com/yourusername/max-api.git
+pip install git+https://github.com/nepobo/max-api.git
 ```
 
 Или для разработки:
 
 ```bash
-git clone https://github.com/yourusername/max-api.git
+git clone https://github.com/nepobo/max-api.git
 cd max-api
 pip install -e .
 ```
@@ -180,7 +180,7 @@ MIT License - см. [LICENSE](LICENSE)
 **Для использования в вашем проекте:**
 
 ```bash
-pip install git+https://github.com/yourusername/max-api.git
+pip install git+https://github.com/nepobo/max-api.git
 ```
 
 ```python

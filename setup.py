@@ -14,7 +14,7 @@ setup(
     description="Python библиотека для работы с MAX Messenger API",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/yourusername/max-api",
+    url="https://github.com/nepobo/max-api",
     packages=find_packages(),
     classifiers=[
         "Development Status :: 3 - Alpha",

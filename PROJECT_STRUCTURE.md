@@ -63,7 +63,7 @@ pip install requests python-dotenv
 
 ```bash
 # Вариант 1: Из Git
-pip install git+https://github.com/yourusername/max-api.git
+pip install git+https://github.com/nepobo/max-api.git
 
 # Вариант 2: Локально
 pip install -e .

@@ -5,7 +5,7 @@
 ### Из исходников
 
 ```bash
-git clone https://github.com/yourusername/max-api.git
+git clone https://github.com/nepobo/max-api.git
 cd max-api
 python -m venv venv
 source venv/bin/activate  # или venv\Scripts\activate на Windows

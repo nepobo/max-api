@@ -5,7 +5,7 @@
 ### Вариант 1: Из Git репозитория (рекомендуется)
 
 ```bash
-pip install git+https://github.com/yourusername/max-api.git
+pip install git+https://github.com/nepobo/max-api.git
 ```
 
 ### Вариант 2: Как локальный пакет
@@ -22,7 +22,7 @@ pip install requests python-dotenv
 
 ```bash
 cd your-project
-git submodule add https://github.com/yourusername/max-api.git libs/max-api
+git submodule add https://github.com/nepobo/max-api.git libs/max-api
 pip install -e libs/max-api
 ```
 
@@ -261,7 +261,7 @@ MAX_BOT_TOKEN=your_token_here
 
 ```txt
 # Если установили через pip
-max-api @ git+https://github.com/yourusername/max-api.git
+max-api @ git+https://github.com/nepobo/max-api.git
 
 # Или если используете локальную копию
 requests>=2.31.0

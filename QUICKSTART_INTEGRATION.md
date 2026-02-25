@@ -34,7 +34,7 @@ client.send_message(chat_id=12374848, text="Привет!")
 
 ```bash
 # Из Git репозитория
-pip install git+https://github.com/yourusername/max-api.git
+pip install git+https://github.com/nepobo/max-api.git
 
 # Или локально
 pip install /path/to/max-api
@@ -51,7 +51,7 @@ from max_api import MAXClient
 
 ```bash
 cd your-project
-git submodule add https://github.com/yourusername/max-api.git libs/max-api
+git submodule add https://github.com/nepobo/max-api.git libs/max-api
 pip install -e libs/max-api
 ```
 
