@@ -64,11 +64,28 @@ client.send_message(
 ```
 
 ### Получение обновлений
+
+#### Управление режимами (UpdateManager)
 ```python
+from max_api import UpdateManager, UpdateMode
+
 # Long Polling (для разработки)
-updates = client.get_updates(timeout=30, marker=last_marker)
+manager = UpdateManager(client, mode=UpdateMode.LONG_POLLING)
+updates = manager.get_updates(timeout=30)
 
 # Webhook (для production)
+manager = UpdateManager(client)
+manager.switch_to_webhook(url="https://your-server.com/webhook")
+```
+
+Подробнее: [UpdateManager Documentation](docs/UPDATE_MANAGER.md)
+
+#### Прямой доступ к API
+```python
+# Long Polling
+updates = client.get_updates(timeout=30, marker=last_marker)
+
+# Webhook
 client.create_subscription(url="https://your-server.com/webhook")
 ```
 

@@ -16,6 +16,7 @@ from .exceptions import (
     RateLimitError,
     ServiceUnavailableError,
 )
+from .update_manager import UpdateManager, UpdateMode
 
 __all__ = [
     "MAXClient",
@@ -25,4 +26,6 @@ __all__ = [
     "NotFoundError",
     "RateLimitError",
     "ServiceUnavailableError",
+    "UpdateManager",
+    "UpdateMode",
 ]
