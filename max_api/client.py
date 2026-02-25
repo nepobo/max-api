@@ -171,7 +171,9 @@ class MAXClient:
         Отправка сообщения в чат
         
         Args:
-            chat_id: ID пользователя (user_id) или чата (chat_id)
+            chat_id: ID получателя
+                     - Положительное число: личный чат (user_id пользователя)
+                     - Отрицательное число: групповой чат (chat_id группы)
             text: Текст сообщения
             attachments: Список вложений (inline_keyboard, файлы и т.д.)
             format: Формат текста ('markdown' или 'html')
@@ -182,18 +184,31 @@ class MAXClient:
             dict: Отправленное сообщение
             
         Example:
+            >>> # Личный чат
             >>> message = client.send_message(
             ...     chat_id=123456789,
             ...     text="**Привет!**",
             ...     format="markdown"
             ... )
+            >>> 
+            >>> # Групповой чат
+            >>> message = client.send_message(
+            ...     chat_id=-987654321,
+            ...     text="Привет всем!"
+            ... )
         """
         chat_id = validate_chat_id(chat_id)
         
-        # user_id передается как query-параметр
-        params = {
-            "user_id": chat_id
-        }
+        # Для групповых чатов (отрицательные) используем chat_id,
+        # для личных (положительные) - user_id
+        if chat_id < 0:
+            params = {
+                "chat_id": chat_id
+            }
+        else:
+            params = {
+                "user_id": chat_id
+            }
         
         if not link_preview:
             params["disable_link_preview"] = True
