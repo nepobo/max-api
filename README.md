@@ -1,281 +1,189 @@
-# MAX API Library
+# MAX Messenger API Client
 
-Python библиотека для работы с мессенджером MAX через API.
-
-## Описание
-
-Эта библиотека предоставляет удобный интерфейс для взаимодействия с MAX Messenger API. Позволяет создавать чат-ботов, отправлять и получать сообщения, обрабатывать события.
-
-## Возможности
-
-- 🤖 Простой в использовании клиент для MAX API
-- 📨 Отправка и получение сообщений
-- 🔔 Получение обновлений через Long Polling
-- ⌨️ Поддержка inline-клавиатур
-- 💬 Форматирование текста (Markdown, HTML)
-- 🖥️ Готовое консольное приложение
-- 📝 Полная типизация и документация
+Python-библиотека для работы с MAX Messenger API.
 
 ## Установка
 
-### Быстрая установка (Linux/Ubuntu/Debian)
-
 ```bash
-# Автоматическая установка
-bash install.sh
+pip install git+https://github.com/yourusername/max-api.git
 ```
 
-### Ручная установка
+Или для разработки:
 
 ```bash
-# 1. Установка python3-venv (если не установлен)
-sudo apt update && sudo apt install python3.12-venv python3-full -y
-
-# 2. Создание виртуального окружения
-python3 -m venv venv
-
-# 3. Активация виртуального окружения
-source venv/bin/activate  # Linux/Mac
-# или venv\Scripts\activate на Windows
-
-# 4. Установка зависимостей
-pip install -r requirements.txt
+git clone https://github.com/yourusername/max-api.git
+cd max-api
+pip install -e .
 ```
-
-### Через pip (после публикации)
-
-```bash
-pip install max-api
-```
-
-> **Важно для Linux:** Используйте виртуальное окружение, чтобы избежать ошибки `externally-managed-environment`. См. [INSTALL_LINUX.md](INSTALL_LINUX.md) для подробностей.
 
 ## Быстрый старт
 
-### 1. Получение токена
-
-1. Зарегистрируйтесь на [платформе MAX для партнёров](https://business.max.ru/self)
-2. Создайте чат-бота
-3. Получите токен в разделе "Интеграция → Получить токен"
-
-### 2. Использование библиотеки
-
 ```python
 from max_api import MAXClient
+import os
 
 # Создание клиента
-client = MAXClient(token="YOUR_BOT_TOKEN")
+client = MAXClient(token=os.getenv('MAX_BOT_TOKEN'))
 
 # Получение информации о боте
 bot = client.get_me()
 print(f"Бот: {bot['name']}")
 
 # Отправка сообщения
-message = client.send_message(
-    chat_id=123456789,
-    text="Привет! 👋"
+client.send_message(
+    chat_id=12374848,
+    text="Привет!",
+    format="markdown"
 )
 
-# Получение обновлений
-for update in client.get_updates():
+# Получение обновлений (Long Polling)
+updates = client.get_updates(timeout=30, marker=last_marker)
+for update in updates:
     if update.get('update_type') == 'message_created':
-        print(f"Новое сообщение: {update['message']['body']['text']}")
+        message = update['message']
+        chat_id = message['sender']['user_id']
+        text = message.get('body', {}).get('text', '')
+        print(f"Получено: {text}")
 ```
 
-### 3. Консольное приложение
+## Основные методы
 
-Создайте файл `.env`:
+### Информация о боте
+```python
+bot_info = client.get_me()
+```
+
+### Отправка сообщения
+```python
+client.send_message(
+    chat_id=user_id,           # ID пользователя
+    text="Текст сообщения",    # Текст
+    format="markdown",         # Опционально: markdown/html
+    attachments=[]            # Опционально: вложения
+)
+```
+
+### Получение обновлений
+```python
+# Long Polling (для разработки)
+updates = client.get_updates(timeout=30, marker=last_marker)
+
+# Webhook (для production)
+client.create_subscription(url="https://your-server.com/webhook")
+```
+
+## Обработка ошибок
+
+```python
+from max_api.exceptions import (
+    MAXAPIException,
+    AuthenticationError,
+    RateLimitError
+)
+
+try:
+    client.send_message(chat_id=123, text="Hi")
+except RateLimitError:
+    print("Превышен лимит запросов")
+except AuthenticationError:
+    print("Неверный токен")
+except MAXAPIException as e:
+    print(f"Ошибка API: {e}")
+```
+
+## Шаблон бота
+
+```python
+from max_api import MAXClient
+import os
+import time
+
+client = MAXClient(token=os.getenv('MAX_BOT_TOKEN'))
+print(f"Бот '{client.get_me()['name']}' запущен!")
+
+last_marker = None
+
+try:
+    while True:
+        try:
+            updates = client.get_updates(timeout=30, marker=last_marker)
+        except Exception as e:
+            if "timeout" in str(e).lower():
+                continue  # Timeout - это нормально
+            print(f"Ошибка: {e}")
+            time.sleep(5)
+            continue
+        
+        for update in updates:
+            if update.get('update_type') == 'message_created':
+                message = update['message']
+                chat_id = message['sender']['user_id']
+                text = message.get('body', {}).get('text', '')
+                
+                # Ваша логика здесь
+                client.send_message(chat_id=chat_id, text=f"Получено: {text}")
+            
+            if 'marker' in update:
+                last_marker = update['marker']
+
+except KeyboardInterrupt:
+    print("\nБот остановлен")
+finally:
+    client.close()
+```
+
+## Важные особенности MAX API
+
+⚠️ **Критические моменты:**
+
+1. **Отправка сообщений**: `user_id` передаётся как query-параметр в URL
+2. **Получение chat_id**: используйте `message['sender']['user_id']` для ответа
+3. **Long Polling timeout**: timeout через 30 секунд - это нормальное поведение, не ошибка
+4. **Rate Limit**: 30 запросов в секунду (автоматически контролируется)
+
+## Конфигурация
+
+Создайте `.env` файл:
 
 ```env
 MAX_BOT_TOKEN=your_bot_token_here
 ```
 
-Запустите приложение:
-
-```bash
-python -m console_app.main
-```
-
-## Примеры
-
-### Эхо-бот
+Или передайте токен напрямую:
 
 ```python
-from max_api import MAXClient
-
-client = MAXClient(token="YOUR_TOKEN")
-
-print("Бот запущен. Ожидание сообщений...")
-
-while True:
-    updates = client.get_updates(timeout=30)
-    
-    for update in updates:
-        if update.get('update_type') == 'message_created':
-            message = update['message']
-            chat_id = message['recipient']['chat_id']
-            text = message['body']['text']
-            
-            # Отправляем обратно то же сообщение
-            client.send_message(chat_id=chat_id, text=f"Вы написали: {text}")
+client = MAXClient(token="your_token")
 ```
-
-### Бот с клавиатурой
-
-```python
-from max_api import MAXClient
-
-client = MAXClient(token="YOUR_TOKEN")
-
-# Отправка сообщения с кнопками
-keyboard = {
-    "type": "inline_keyboard",
-    "payload": {
-        "buttons": [
-            [
-                {"type": "callback", "text": "Кнопка 1", "payload": "btn1"},
-                {"type": "callback", "text": "Кнопка 2", "payload": "btn2"}
-            ],
-            [
-                {"type": "link", "text": "Открыть сайт", "url": "https://max.ru"}
-            ]
-        ]
-    }
-}
-
-client.send_message(
-    chat_id=123456789,
-    text="Выберите действие:",
-    attachments=[keyboard]
-)
-```
-
-Больше примеров в папке [`examples/`](examples/).
 
 ## Документация
 
-### MAXClient
+- Полная документация: [docs/](docs/)
+- Примеры использования: [docs/examples/](docs/examples/)
+- MAX API документация: https://dev.max.ru/docs-api
 
-Основной класс для работы с API.
-
-#### Инициализация
-
-```python
-client = MAXClient(
-    token="YOUR_TOKEN",
-    base_url="https://platform-api.max.ru"  # опционально
-)
-```
-
-#### Методы
-
-##### get_me()
-
-Получение информации о боте.
-
-```python
-bot_info = client.get_me()
-# Возвращает: {'user_id': 1, 'name': 'My Bot', 'username': 'my_bot', ...}
-```
-
-##### send_message(chat_id, text, attachments=None, format=None)
-
-Отправка сообщения в чат.
-
-**Параметры:**
-- `chat_id` (int) - ID чата
-- `text` (str) - Текст сообщения
-- `attachments` (list, optional) - Вложения (клавиатуры, файлы)
-- `format` (str, optional) - Формат текста ('markdown' или 'html')
-
-```python
-message = client.send_message(
-    chat_id=123456789,
-    text="**Жирный текст**",
-    format="markdown"
-)
-```
-
-##### get_updates(limit=None, timeout=30, marker=None, update_types=None)
-
-Получение обновлений (Long Polling).
-
-**Параметры:**
-- `limit` (int, optional) - Максимальное количество обновлений
-- `timeout` (int) - Таймаут ожидания в секундах
-- `marker` (int, optional) - Маркер последнего полученного обновления
-- `update_types` (list, optional) - Типы обновлений для получения
-
-```python
-updates = client.get_updates(timeout=30, limit=10)
-```
-
-## Структура проекта
-
-```
-max-api/
-├── max_api/              # Библиотека
-│   ├── client.py         # Основной клиент
-│   ├── methods/          # Методы API
-│   ├── models/           # Модели данных
-│   └── exceptions.py     # Исключения
-├── console_app/          # Консольное приложение
-│   └── main.py
-├── examples/             # Примеры использования
-├── tests/                # Тесты
-└── README.md
-```
-
-## Требования
+## Зависимости
 
 - Python 3.8+
 - requests
 - python-dotenv
 
-Полный список зависимостей в [`requirements.txt`](requirements.txt).
+## Лицензия
 
-## Разработка
-
-### Установка для разработки
-
-```bash
-git clone https://github.com/yourusername/max-api.git
-cd max-api
-python -m venv venv
-source venv/bin/activate  # или venv\Scripts\activate на Windows
-pip install -r requirements.txt
-```
-
-### Запуск тестов
-
-```bash
-pytest tests/
-```
-
-## Ограничения API
-
-- Максимум 30 запросов в секунду (RPS)
-- Long Polling рекомендуется только для разработки
-- Для production используйте Webhook
+MIT License - см. [LICENSE](LICENSE)
 
 ## Поддержка
 
-- [Документация MAX API](https://dev.max.ru/docs-api)
-- [Платформа для партнёров](https://business.max.ru/self)
-- [FAQ](https://dev.max.ru/help)
+Для вопросов и багрепортов используйте GitHub Issues.
 
-## Лицензия
+---
 
-MIT License
+**Для использования в вашем проекте:**
 
-## Автор
+```bash
+pip install git+https://github.com/yourusername/max-api.git
+```
 
-Ваше имя / организация
-
-## Changelog
-
-### v0.1.0 (2026-02-25)
-- Первая версия библиотеки
-- Базовая поддержка отправки/получения сообщений
-- Консольное приложение
-- Примеры использования
+```python
+from max_api import MAXClient
+# Используйте как обычную библиотеку
+```
